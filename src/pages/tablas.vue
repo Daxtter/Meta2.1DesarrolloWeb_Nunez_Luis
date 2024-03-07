@@ -1,127 +1,249 @@
-<template>
-    <v-card
-      flat
-      title="Nutrition"
-    >
-      <template v-slot:text>
-        <v-text-field
-          v-model="search"
-          label="Search"
-          prepend-inner-icon="mdi-magnify"
-          single-line
-          variant="outlined"
-          hide-details
-        ></v-text-field>
-      </template>
-  
-      <v-data-table
-        :headers="headers"
-        :items="desserts"
-        :search="search"
-      ></v-data-table>
-    </v-card>
-  </template>
-  <script setup>
-  import { ref } from 'vue';
-  const search = ref('');
-  const headers = ref(
-    [
-            {
-              align: 'start',
-              key: 'name',
-              sortable: false,
-              title: 'Dessert (100g serving)',
-            },
-            { key: 'calories', title: 'Calories' },
-            { key: 'fat', title: 'Fat (g)' },
-            { key: 'carbs', title: 'Carbs (g)' },
-            { key: 'protein', title: 'Protein (g)' },
-            { key: 'iron', title: 'Iron (%)' },
-          ]
+<script setup>
+import { ref, computed, watch } from 'vue';
 
-  );
-  const desserts = ref(
-    [
-            {
-              name: 'Frozen Yogurt',
-              calories: 159,
-              fat: 6.0,
-              carbs: 24,
-              protein: 4.0,
-              iron: 1,
-            },
-            {
-              name: 'Ice cream sandwich',
-              calories: 237,
-              fat: 9.0,
-              carbs: 37,
-              protein: 4.3,
-              iron: 1,
-            },
-            {
-              name: 'Eclair',
-              calories: 262,
-              fat: 16.0,
-              carbs: 23,
-              protein: 6.0,
-              iron: 7,
-            },
-            {
-              name: 'Cupcake',
-              calories: 305,
-              fat: 3.7,
-              carbs: 67,
-              protein: 4.3,
-              iron: 8,
-            },
-            {
-              name: 'Gingerbread',
-              calories: 356,
-              fat: 16.0,
-              carbs: 49,
-              protein: 3.9,
-              iron: 16,
-            },
-            {
-              name: 'Jelly bean',
-              calories: 375,
-              fat: 0.0,
-              carbs: 94,
-              protein: 0.0,
-              iron: 0,
-            },
-            {
-              name: 'Lollipop',
-              calories: 392,
-              fat: 0.2,
-              carbs: 98,
-              protein: 0,
-              iron: 2,
-            },
-            {
-              name: 'Honeycomb',
-              calories: 408,
-              fat: 3.2,
-              carbs: 87,
-              protein: 6.5,
-              iron: 45,
-            },
-            {
-              name: 'Donut',
-              calories: 452,
-              fat: 25.0,
-              carbs: 51,
-              protein: 4.9,
-              iron: 22,
-            },
-            {
-              name: 'KitKat',
-              calories: 518,
-              fat: 26.0,
-              carbs: 65,
-              protein: 7,
-              iron: 6,
-            },
-          ]
-  );
+
+const informacion = ref("");
+async function obtenerInformacion()
+    {
+
+
+        let respuesta = await fetch ("https://jsonplaceholder.typicode.com/todos");
+        let respuesta2 = await respuesta.json()
+        informacion.value = respuesta2
+    }
+    obtenerInformacion();
+const dialog = ref(false);
+const dialogDelete = ref(false);
+const headers = [
+  {title: 'ID usuario', key: 'userId'},
+  {title: 'ID ', key: 'id'},
+  {title: 'Titulo ', key: 'title'},
+  {title: 'Completado', key: 'completed'},
+  {title: 'Actions', key: 'actions',sortable:false}
+];
+
+
+const desserts = ref([]);
+const editedIndex = ref(-1);
+const editedItem = ref({
+  userId: 0,
+  id: 0,
+  title: '',
+  completed: '',
+ 
+});
+const defaultItem = {
+  userId: 0,
+  id: 0,
+  title: '',
+  completed: '',
+ 
+};
+
+
+const formTitle = computed(() => (editedIndex.value === -1 ? 'New Item' : 'Edit Item'));
+
+
+watch(dialog, (val) => val || close());
+watch(dialogDelete, (val) => val || closeDelete());
+
+
+
+
+
+
+const editItem = (item) => {
+  editedIndex.value = informacion.value.indexOf(item);
+  editedItem.value = { ...item };
+  dialog.value = true;
+};
+
+
+const deleteItem = (item) => {
+  editedIndex.value = informacion.value.indexOf(item);
+  editedItem.value = { ...item };
+  dialogDelete.value = true;
+};
+
+
+const deleteItemConfirm = () => {
+  informacion.value.splice(editedIndex.value, 1);
+  closeDelete();
+};
+
+
+const close = () => {
+  dialog.value = false;
+  editedItem.value = { ...defaultItem };
+  editedIndex.value = -1;
+};
+
+
+const closeDelete = () => {
+  dialogDelete.value = false;
+  editedItem.value = { ...defaultItem };
+  editedIndex.value = -1;
+};
+
+
+const save = () => {
+  if (editedIndex.value > -1) {
+    Object.assign(informacion.value[editedIndex.value], editedItem.value);
+  } else {
+    informacion.value.push(editedItem.value);
+  }
+  close();
+};
+
+
+
+
+
+
+    console.log(informacion);
+   
+
+
   </script>
+<template>
+  <v-data-table
+    :headers="headers"
+    :items="informacion"
+   
+  >
+    <template v-slot:top>
+      <v-toolbar
+        flat
+      >
+        <v-toolbar-title>My CRUD</v-toolbar-title>
+        <v-divider
+          class="mx-4"
+          inset
+          vertical
+        ></v-divider>
+        <v-spacer></v-spacer>
+        <v-dialog
+          v-model="dialog"
+          max-width="500px"
+        >
+          <template v-slot:activator="{ props }">
+            <v-btn
+              class="mb-2"
+              color="primary"
+              dark
+              v-bind="props"
+            >
+              New Item
+            </v-btn>
+          </template>
+          <v-card>
+            <v-card-title>
+              <span class="text-h5">{{ formTitle }}</span>
+            </v-card-title>
+
+
+            <v-card-text>
+              <v-container>
+                <v-row>
+                  <v-col
+                    cols="12"
+                    md="4"
+                    sm="6"
+                  >
+                    <v-text-field
+                      v-model="editedItem.userId"
+                      label="ID usuario"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    md="4"
+                    sm="6"
+                  >
+                    <v-text-field
+                      v-model="editedItem.id"
+                      label="ID"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    md="4"
+                    sm="6"
+                  >
+                    <v-text-field
+                      v-model="editedItem.title"
+                      label="Titulo"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    md="4"
+                    sm="6"
+                  >
+                    <v-text-field
+                      v-model="editedItem.completed"
+                      label="Completado"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-card-text>
+
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn
+                color="blue-darken-1"
+                variant="text"
+                @click="close"
+              >
+                Cancel
+              </v-btn>
+              <v-btn
+                color="blue-darken-1"
+                variant="text"
+                @click="save"
+              >
+                Save
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-dialog v-model="dialogDelete" max-width="500px">
+          <v-card>
+            <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue-darken-1" variant="text" @click="closeDelete">Cancel</v-btn>
+              <v-btn color="blue-darken-1" variant="text" @click="deleteItemConfirm">OK</v-btn>
+              <v-spacer></v-spacer>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-toolbar>
+    </template>
+    <template v-slot:item.actions="{ item }">
+      <v-icon
+        class="me-2"
+        size="small"
+        @click="editItem(item)"
+      >
+        mdi-pencil
+      </v-icon>
+      <v-icon
+        size="small"
+        @click="deleteItem(item)"
+      >
+        mdi-delete
+      </v-icon>
+    </template>
+    <template v-slot:no-data>
+      <v-btn
+        color="primary"
+        @click="initialize"
+      >
+        Reset
+      </v-btn>
+    </template>
+  </v-data-table>
+</template>
