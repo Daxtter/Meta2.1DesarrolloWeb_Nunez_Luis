@@ -21,6 +21,11 @@
           link to ="/tablas"
           prepend-icon = "mdi mdi-database-arrow-right"
         ></v-list-item>
+        <v-list-item 
+          title="tabla con CRUD"
+          link to ="/tablasCRUD"
+          prepend-icon = "mdi mdi-database"
+        ></v-list-item>
       </v-navigation-drawer>
     
     </v-container>  

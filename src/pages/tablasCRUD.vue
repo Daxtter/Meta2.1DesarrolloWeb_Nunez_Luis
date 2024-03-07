@@ -2,24 +2,41 @@
 import { ref, computed, watch } from 'vue';
 
 const informacion = ref("");
-console.log(informacion)
+//console.log(informacion)
 async function obtenerInformacion()
     {
-
-
-        let respuesta = await fetch ("https://jsonplaceholder.typicode.com/todos");
-        let respuesta2 = await respuesta.json()
-        informacion.value =  respuesta2
+        let respuesta = await fetch ("https://jsonplaceholder.typicode.com/users");
+        let respuestaUsuarios = await respuesta.json();
+        let respuesta2 = await fetch ("https://jsonplaceholder.typicode.com/posts");
+        let respuestaPost = await respuesta2.json();
+        let lista = [];
+        let objeto;
+        console.log(respuestaPost);
+        for(let i=0; i < respuestaUsuarios.length; i++){
+            for(let j=0; j < respuestaPost.length; j++){
+                if(respuestaPost.id == respuestaPost.userId )
+                {
+                    objeto = {
+                        autor: respuestaUsuarios[i].name,
+                        title : respuestaPost[j].title,
+                        post: respuestaPost[j].body
+                    };
+                    //console.log(objeto);
+                    lista.push(objeto);
+                }
+            }
+        }
+        console.log(lista);
+        informacion.value = lista;
     }
     obtenerInformacion();
       console.log(informacion);
 const dialog = ref(false);
 const dialogDelete = ref(false);
 const headers = [
-  {title: 'ID usuario', key: 'userId'},
-  {title: 'ID ', key: 'id'},
+  {title: 'Autor', key: 'autor'},
   {title: 'Titulo ', key: 'title'},
-  {title: 'Completado', key: 'completed'},
+  {title: 'Post', key: 'post'},
   {title: 'Actions', key: 'actions',sortable:false}
 ];
 
@@ -27,18 +44,16 @@ const headers = [
 const desserts = ref([]);
 const editedIndex = ref(-1);
 const editedItem = ref({
-  userId: 0,
-  id: 0,
+  autor: '',
   title: '',
-  completed: '',
+  post: ''
  
 });
 const defaultItem = {
-  userId: 0,
-  id: 0,
+    autor: '',
   title: '',
-  completed: '',
- 
+  post: ''
+
 };
 
 
@@ -152,18 +167,8 @@ const save = () => {
                     sm="6"
                   >
                     <v-text-field
-                      v-model="editedItem.userId"
-                      label="ID usuario"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    sm="6"
-                  >
-                    <v-text-field
-                      v-model="editedItem.id"
-                      label="ID"
+                      v-model="editedItem.autor"
+                      label="Autor"
                     ></v-text-field>
                   </v-col>
                   <v-col
@@ -182,11 +187,11 @@ const save = () => {
                     sm="6"
                   >
                     <v-text-field
-                      v-model="editedItem.completed"
-                      label="Completado"
+                      v-model="editedItem.post"
+                      label="Post"
                     ></v-text-field>
                   </v-col>
-                </v-row>
+                 </v-row>
               </v-container>
             </v-card-text>
 
@@ -212,7 +217,7 @@ const save = () => {
         </v-dialog>
         <v-dialog v-model="dialogDelete" max-width="500px">
           <v-card>
-            <v-card-title class="text-h5">¿Estas seguro que quieres eliminar este elemento?</v-card-title>
+            <v-card-title class="text-h5">¿Estas seguro que quieres eliminar?</v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue-darken-1" variant="text" @click="closeDelete">Cancelar</v-btn>
