@@ -212,7 +212,7 @@ const save = () => {
         </v-dialog>
         <v-dialog v-model="dialogDelete" max-width="500px">
           <v-card>
-            <v-card-title class="text-h5">¿Estas seguro que quieres eliminar este elemento?</v-card-title>
+            <v-card-title class="text-h5">¿Estas seguro que quieres eliminar?</v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue-darken-1" variant="text" @click="closeDelete">Cancelar</v-btn>

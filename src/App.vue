@@ -26,6 +26,22 @@
           link to ="/tablasCRUD"
           prepend-icon = "mdi mdi-database"
         ></v-list-item>
+        <v-list-item 
+          title="Activos REST"
+          link to ="/activos"
+          prepend-icon = "mdi mdi-database"
+        ></v-list-item>
+        <v-list-item 
+          title="Responsable REST"
+          link to ="/responsable"
+          prepend-icon = "mdi mdi-database"
+        ></v-list-item>
+        <v-list-item 
+          title="Ubicacion REST"
+          link to ="/ubicacion"
+          prepend-icon = "mdi mdi-database"
+        ></v-list-item>
+
       </v-navigation-drawer>
     
     </v-container>  
